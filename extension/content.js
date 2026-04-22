@@ -12,6 +12,7 @@
   let isProcessing = false;
   let hudVisible = false;
   let albumsLoaded = false;
+  let isLoadingAlbums = false;
 
   // ─── Build overlay using Shadow DOM ──────────────────────────────────────
   // Attaching to <html> (not body) avoids being clipped by body overflow:hidden.
@@ -233,6 +234,7 @@
     const sel    = S('album-select');
     const status = S('load-status');
     const counter = S('counter');
+    isLoadingAlbums = on;
     if (sel)     sel.disabled = on;
     if (status)  status.classList.toggle('active', on);
     if (counter) counter.style.display = on ? 'none' : '';
@@ -455,9 +457,11 @@
 
     if (e.key === 'ArrowLeft' && !e.repeat) {
       e.preventDefault(); e.stopPropagation();
+      if (isLoadingAlbums) { showToast('Loading albums…'); return; }
       doSkip();
     } else if (e.key === 'ArrowRight' && !e.repeat) {
       e.preventDefault(); e.stopPropagation();
+      if (isLoadingAlbums) { showToast('Loading albums…'); return; }
       doAdd();
     }
   }, true);
