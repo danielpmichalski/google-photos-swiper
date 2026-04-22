@@ -193,7 +193,7 @@
         </button>
       </div>
 
-      <div id="toggle">🗂 Swiper</div>
+      <div id="toggle">🗂 Google Photos Swiper</div>
     `;
 
     window.__psShadow = shadow;
