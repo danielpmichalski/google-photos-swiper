@@ -1,10 +1,10 @@
-# Google Photos Sorter
+# Google Photos Swiper
 
 A Chrome extension for rapidly sorting Google Photos into albums using keyboard shortcuts. Burns through a backlog of hundreds of unorganized photos with minimal effort.
 
 ## How it works
 
-Photos Sorter injects a small HUD bar at the bottom of `photos.google.com`. Open any photo, pick a target album from the dropdown, then swipe through your library with arrow keys.
+Google Photos Swiper injects a small HUD bar at the bottom of `photos.google.com`. Open any photo, pick a target album from the dropdown, then swipe through your library with arrow keys.
 
 - `→` — add current photo to the selected album
 - `←` — skip (move to next photo without adding)
