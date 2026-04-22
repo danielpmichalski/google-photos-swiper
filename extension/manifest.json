@@ -4,17 +4,17 @@
   "version": "1.0",
   "description": "Keyboard-driven album sorter overlay for Google Photos",
   "permissions": ["storage", "scripting", "tabs"],
-  "background": { "service_worker": "src/background.js" },
+  "background": { "service_worker": "background.js" },
   "host_permissions": ["https://photos.google.com/*"],
   "content_scripts": [
     {
       "matches": ["https://photos.google.com/*"],
-      "js": ["src/content.js"],
+      "js": ["content.js"],
       "run_at": "document_idle"
     }
   ],
   "action": {
-    "default_popup": "src/popup.html",
+    "default_popup": "popup.html",
     "default_title": "Photos Sorter"
   }
 }

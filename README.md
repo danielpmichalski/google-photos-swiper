@@ -19,7 +19,7 @@ The extension is not on the Chrome Web Store. Install it as an unpacked extensio
 1. Clone or download this repo
 2. Open Chrome and go to `chrome://extensions`
 3. Enable **Developer mode** (top right toggle)
-4. Click **Load unpacked** and select the `photos-sorter/` folder
+4. Click **Load unpacked** and select the `extension/` folder
 5. Navigate to [photos.google.com](https://photos.google.com) — the HUD bar appears at the bottom
 
 ## Usage
