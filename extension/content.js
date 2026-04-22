@@ -131,6 +131,20 @@
         #counter { font-size: 12px; color: #9ca3af; white-space: nowrap; font-family: inherit; }
         #counter b { color: #374151; font-weight: 600; }
 
+        #load-status {
+          font-size: 12px; color: #6b7280; white-space: nowrap; font-family: inherit;
+          display: none;
+        }
+        #load-status.active {
+          display: inline;
+          animation: loadPulse 1.4s ease-in-out infinite;
+        }
+        @keyframes loadPulse {
+          0%, 100% { opacity: 1; }
+          50%       { opacity: 0.35; }
+        }
+        #album-select:disabled { opacity: 0.55; cursor: default; }
+
         #toggle {
           position: fixed; bottom: 12px; right: 14px;
           z-index: 2147483647;
@@ -160,6 +174,7 @@
             <option value="">— select album —</option>
           </select>
           <span id="counter">skipped <b id="n-skip">0</b> &middot; added <b id="n-add">0</b></span>
+          <span id="load-status">Loading albums…</span>
         </div>
         <div class="sep"></div>
         <button class="action" id="btn-add">
@@ -196,13 +211,23 @@
   function S(id) { return window.__psShadow?.getElementById(id); }
 
   // ─── Album loading ────────────────────────────────────────────────────────
+  function setLoading(on) {
+    const sel    = S('album-select');
+    const status = S('load-status');
+    const counter = S('counter');
+    if (sel)     sel.disabled = on;
+    if (status)  status.classList.toggle('active', on);
+    if (counter) counter.style.display = on ? 'none' : '';
+  }
+
   function loadAlbums() {
     const sel = S('album-select');
     if (!sel) return;
     scrapeNavAlbums(sel);
     // Fetch via background tab — fetch() returns SPA shell, need real JS-rendered DOM
-    showToast('Loading albums…');
+    setLoading(true);
     chrome.runtime.sendMessage({ type: 'FETCH_ALBUMS' }, (resp) => {
+      setLoading(false);
       if (chrome.runtime.lastError) { showToast('Could not load albums', 'skip'); return; }
       const seen = new Set(albums.map(a => a.id));
       (resp?.albums || []).forEach(({ id, title }) => {
