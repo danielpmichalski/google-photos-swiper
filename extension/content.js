@@ -154,6 +154,11 @@
           display: inline;
           background: #dcfce7; color: #166534; border: 1px solid #86efac;
         }
+        #album-badge.checking {
+          display: inline;
+          background: #f3f4f6; color: #9ca3af; border: 1px solid #d1d5db;
+          animation: loadPulse 1.4s ease-in-out infinite;
+        }
 
         #toggle {
           position: fixed; bottom: 12px; right: 14px;
@@ -219,7 +224,6 @@
       updateCounter();
       if (data.ps_album_id) {
         selectedAlbum = { id: data.ps_album_id, title: data.ps_album_title };
-        refreshBadge();
       }
     });
 
@@ -535,12 +539,52 @@
     const b = S('album-badge');
     if (!b) return;
     b.className = state || '';
-    b.textContent = state === 'in' ? '✓ Already in album' : '';
+    b.textContent = state === 'in' ? '✓ Already in album' : state === 'checking' ? 'Checking…' : '';
   }
 
-  function refreshBadge() {
+  // Silently opens the Add-to-album dialog, reads aria-selected, closes — never adds.
+  async function peekAlbumMembership() {
+    if (isProcessing) return null;
+    const more = findByAriaLabel(['More options', 'Open menu', 'more options', 'Więcej opcji']);
+    if (!more) return null;
+    more.click();
+    await sleep(650);
+    const item = findMenuItemByText('Add to album', 'Dodaj do albumu');
+    if (!item) { fireKey('Escape'); return null; }
+    item.click();
+    await sleep(1200);
+    const target = selectedAlbum.title.toLowerCase();
+    let result = null;
+    for (let i = 0; i < 15; i++) {
+      const listbox = document.querySelector('[role="listbox"]');
+      if (listbox) {
+        const byId = listbox.querySelector(`[data-id="${selectedAlbum.id}"]`);
+        if (byId && isVisible(byId)) { result = byId.getAttribute('aria-selected') === 'true' ? 'in' : 'not-in'; break; }
+        for (const li of listbox.querySelectorAll('[role="option"]')) {
+          if (!isVisible(li)) continue;
+          const label = (li.getAttribute('aria-label') || '').toLowerCase();
+          if (label === target || label.startsWith(target + ' ') || label.startsWith(target + '·')) {
+            result = li.getAttribute('aria-selected') === 'true' ? 'in' : 'not-in'; break;
+          }
+        }
+        if (result !== null) break;
+      }
+      await sleep(200);
+    }
+    fireKey('Escape');
+    await sleep(300);
+    return result;
+  }
+
+  let badgeProbeId = 0;
+  async function refreshBadge() {
     if (!selectedAlbum || !location.href.includes('/photo/')) { setAlbumBadge(null); return; }
-    setAlbumBadge(isAlreadyInAlbumByUrl() ? 'in' : null);
+    if (isAlreadyInAlbumByUrl()) { setAlbumBadge('in'); return; }
+    const myId = ++badgeProbeId;
+    setAlbumBadge('checking');
+    const result = await peekAlbumMembership();
+    if (myId !== badgeProbeId) return; // stale — user navigated or changed album
+    setAlbumBadge(result === 'in' ? 'in' : null);
   }
 
   function isVisible(el) {
@@ -558,12 +602,16 @@
     buildOverlay();
   }
 
-  // Re-scrape albums on SPA navigation to /albums
+  // Re-scrape albums on SPA navigation; debounce badge probe so rapid swipes don't stack.
   let lastUrl = location.href;
+  let badgeDebounce;
   new MutationObserver(() => {
     if (location.href === lastUrl) return;
     lastUrl = location.href;
-    if (location.href.includes('/photo/')) refreshBadge();
+    if (location.href.includes('/photo/')) {
+      clearTimeout(badgeDebounce);
+      badgeDebounce = setTimeout(refreshBadge, 800);
+    }
     if (location.href.includes('/albums')) {
       setTimeout(() => { if (S('album-select')?.options.length <= 1) loadAlbums(); }, 1200);
     }
