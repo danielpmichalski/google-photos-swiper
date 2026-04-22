@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Google Photos Swiper",
   "version": "1.0",
-  "description": "Keyboard-driven album assignment \"swiper\" overlay for Google Photos",
+  "description": "Keyboard-driven album assignment overlay for Google Photos.",
   "permissions": [
     "scripting",
     "storage",
