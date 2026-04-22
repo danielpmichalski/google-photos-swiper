@@ -1,74 +1,143 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<meta charset="utf-8">
-<style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body {
-    width: 256px;
-    background: #fff;
-    color: #111827;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    font-size: 13px;
-    padding: 16px;
-  }
-  .header {
-    display: flex; align-items: center; gap: 8px;
-    margin-bottom: 14px; padding-bottom: 14px;
-    border-bottom: 1px solid #f3f4f6;
-  }
-  .icon { font-size: 20px; }
-  h1 { font-size: 14px; font-weight: 600; color: #111827; }
-  .sub { font-size: 11px; color: #9ca3af; margin-top: 1px; }
+  <meta charset="utf-8">
+  <style>
+      * {
+          box-sizing: border-box;
+          margin: 0;
+          padding: 0;
+      }
 
-  .section-label {
-    font-size: 10px; font-weight: 600; letter-spacing: 0.06em;
-    text-transform: uppercase; color: #9ca3af;
-    margin: 14px 0 8px;
-  }
+      body {
+          width: 256px;
+          background: #fff;
+          color: #111827;
+          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+          font-size: 13px;
+          padding: 16px;
+      }
 
-  .shortcut-row {
-    display: flex; align-items: center; gap: 10px;
-    padding: 5px 0; color: #4b5563;
-  }
-  .kbd {
-    display: inline-flex; align-items: center; justify-content: center;
-    min-width: 26px; height: 22px; padding: 0 5px;
-    border: 1.5px solid #d1d5db; border-radius: 5px;
-    font-size: 12px; color: #6b7280; background: #f9fafb;
-    font-family: inherit; flex-shrink: 0;
-  }
+      .header {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          margin-bottom: 14px;
+          padding-bottom: 14px;
+          border-bottom: 1px solid #f3f4f6;
+      }
 
-  .stat-row {
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 6px 0; border-bottom: 1px solid #f3f4f6; color: #6b7280;
-  }
-  .stat-row:last-child { border-bottom: none; }
-  .stat-val { font-weight: 600; color: #111827; }
+      .icon {
+          font-size: 20px;
+      }
 
-  .btn {
-    display: block; width: 100%; margin-top: 14px;
-    padding: 9px 14px; text-align: center;
-    background: #f9fafb; border: 1.5px solid #e5e7eb; border-radius: 8px;
-    color: #374151; font-size: 13px; font-weight: 500;
-    cursor: pointer; text-decoration: none;
-    transition: background 0.12s, border-color 0.12s;
-    font-family: inherit;
-  }
-  .btn:hover { background: #f3f4f6; border-color: #d1d5db; color: #111; }
-  .btn.primary {
-    background: #111827; border-color: #111827; color: #fff; margin-top: 8px;
-  }
-  .btn.primary:hover { background: #1f2937; }
-</style>
+      h1 {
+          font-size: 14px;
+          font-weight: 600;
+          color: #111827;
+      }
+
+      .sub {
+          font-size: 11px;
+          color: #9ca3af;
+          margin-top: 1px;
+      }
+
+      .section-label {
+          font-size: 10px;
+          font-weight: 600;
+          letter-spacing: 0.06em;
+          text-transform: uppercase;
+          color: #9ca3af;
+          margin: 14px 0 8px;
+      }
+
+      .shortcut-row {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          padding: 5px 0;
+          color: #4b5563;
+      }
+
+      .kbd {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          min-width: 26px;
+          height: 22px;
+          padding: 0 5px;
+          border: 1.5px solid #d1d5db;
+          border-radius: 5px;
+          font-size: 12px;
+          color: #6b7280;
+          background: #f9fafb;
+          font-family: inherit;
+          flex-shrink: 0;
+      }
+
+      .stat-row {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          padding: 6px 0;
+          border-bottom: 1px solid #f3f4f6;
+          color: #6b7280;
+      }
+
+      .stat-row:last-child {
+          border-bottom: none;
+      }
+
+      .stat-val {
+          font-weight: 600;
+          color: #111827;
+      }
+
+      .btn {
+          display: block;
+          width: 100%;
+          margin-top: 14px;
+          padding: 9px 14px;
+          text-align: center;
+          background: #f9fafb;
+          border: 1.5px solid #e5e7eb;
+          border-radius: 8px;
+          color: #374151;
+          font-size: 13px;
+          font-weight: 500;
+          cursor: pointer;
+          text-decoration: none;
+          transition: background 0.12s, border-color 0.12s;
+          font-family: inherit;
+      }
+
+      .btn:hover {
+          background: #f3f4f6;
+          border-color: #d1d5db;
+          color: #111;
+      }
+
+      .btn.primary {
+          background: #111827;
+          border-color: #111827;
+          color: #fff;
+          margin-top: 8px;
+      }
+
+      .btn.primary:hover {
+          background: #1f2937;
+      }
+  </style>
+  <title></title>
 </head>
 <body>
 
 <div class="header">
   <span class="icon">🗂</span>
   <div>
-    <h1>Photos Sorter</h1>
-    <div class="sub">Google Photos album helper</div>
+    <h1>Google Photos Swiper</h1>
+    <div class="sub">Google Photos Album Helper</div>
   </div>
 </div>
 
@@ -81,7 +150,6 @@
 <div class="stat-row"><span>Skipped</span><span class="stat-val" id="n-skip">0</span></div>
 <div class="stat-row"><span>Added to album</span><span class="stat-val" id="n-add">0</span></div>
 
-<a class="btn" id="btn-albums" href="#">Browse Albums first →</a>
 <a class="btn primary" id="btn-photos" href="#">Open Google Photos</a>
 
 <script src="popup.js"></script>
