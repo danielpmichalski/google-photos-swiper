@@ -1,4 +1,4 @@
-// Photos Sorter — content script v2
+// Google Photos Swiper — content script v2
 // Arrow Right → add to selected album | Arrow Left → skip | Backtick → toggle
 
 (function () {
@@ -193,7 +193,7 @@
         </button>
       </div>
 
-      <div id="toggle">🗂 Sorter</div>
+      <div id="toggle">🗂 Swiper</div>
     `;
 
     window.__psShadow = shadow;
@@ -345,7 +345,7 @@
       goToNextPhoto();
     } catch (err) {
       showToast(err.message, 'skip');
-      console.warn('[PhotosSorter]', err);
+      console.warn('[GooglePhotosSwiper]', err);
       fireKey('Escape');
     } finally {
       isProcessing = false;
@@ -404,7 +404,7 @@
       if (li) return clickOrDetect(li);
       await sleep(50);
     }
-    console.warn('[PhotosSorter] album not found in dialog. id:', selectedAlbum.id, 'title:', selectedAlbum.title);
+    console.warn('[GooglePhotosSwiper] album not found in dialog. id:', selectedAlbum.id, 'title:', selectedAlbum.title);
     return 'not-found';
   }
 
