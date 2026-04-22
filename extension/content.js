@@ -320,7 +320,7 @@
     // Option C: free URL pre-check (only works when browsing from within the album)
     if (isAlreadyInAlbumByUrl()) {
       showToast('Already in this album');
-      await sleep(450);
+      await sleep(250);
       goToNextPhoto();
       return;
     }
@@ -333,7 +333,7 @@
       const result = await automateAddToAlbum();
       if (result === 'already') {
         showToast('Already in this album');
-        await sleep(450);
+        await sleep(250);
         goToNextPhoto();
         return;
       }
@@ -341,7 +341,7 @@
       updateCounter();
       chrome.storage.local.set({ ps_add: addCount });
       showToast(`✓ Added to "${selectedAlbum.title}"`, 'success');
-      await sleep(450);
+      await sleep(250);
       goToNextPhoto();
     } catch (err) {
       showToast(err.message, 'skip');
@@ -361,13 +361,13 @@
     ]);
     if (!more) throw new Error('Open a photo first — more options button not found');
     more.click();
-    await sleep(650);
-
-    // 2. Click "Add to album"
-    const item = findMenuItemByText('Add to album', 'Dodaj do albumu');
+    const item = await waitForElement(() => findMenuItemByText('Add to album', 'Dodaj do albumu'), 1500);
     if (!item) throw new Error('"Add to album" not in menu');
+
+    // 2. Click "Add to album", then wait for dialog
     item.click();
-    await sleep(1200);
+    const dialogReady = await waitForElement(() => document.querySelector('[role="listbox"],[role="option"]'), 3000);
+    if (!dialogReady) throw new Error('Album dialog did not appear');
 
     // 3. Pick album in dialog
     const result = await pickAlbumInDialog();
@@ -399,10 +399,10 @@
 
   async function pickAlbumInDialog() {
     const target = selectedAlbum.title.toLowerCase();
-    for (let i = 0; i < 25; i++) {
+    for (let i = 0; i < 100; i++) {
       const li = findAlbumOption(target);
       if (li) return clickOrDetect(li);
-      await sleep(200);
+      await sleep(50);
     }
     console.warn('[PhotosSorter] album not found in dialog. id:', selectedAlbum.id, 'title:', selectedAlbum.title);
     return 'not-found';
@@ -546,6 +546,16 @@
   }
 
   function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+  async function waitForElement(predicate, maxMs = 1500, intervalMs = 50) {
+    const deadline = Date.now() + maxMs;
+    while (Date.now() < deadline) {
+      const el = predicate();
+      if (el) return el;
+      await sleep(intervalMs);
+    }
+    return null;
+  }
 
   // ─── Init ─────────────────────────────────────────────────────────────────
   if (document.readyState === 'loading') {
