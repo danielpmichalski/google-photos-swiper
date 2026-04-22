@@ -1,20 +1,32 @@
 {
   "manifest_version": 3,
-  "name": "Photos Sorter",
+  "name": "Google Photos Swiper",
   "version": "1.0",
-  "description": "Keyboard-driven album sorter overlay for Google Photos",
-  "permissions": ["storage", "scripting", "tabs"],
-  "background": { "service_worker": "background.js" },
-  "host_permissions": ["https://photos.google.com/*"],
+  "description": "Keyboard-driven album assignment \"swiper\" overlay for Google Photos",
+  "permissions": [
+    "scripting",
+    "storage",
+    "tabs"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "host_permissions": [
+    "https://photos.google.com/*"
+  ],
   "content_scripts": [
     {
-      "matches": ["https://photos.google.com/*"],
-      "js": ["content.js"],
+      "matches": [
+        "https://photos.google.com/*"
+      ],
+      "js": [
+        "content.js"
+      ],
       "run_at": "document_idle"
     }
   ],
   "action": {
     "default_popup": "popup.html",
-    "default_title": "Photos Sorter"
+    "default_title": "Google Photos Swiper"
   }
 }
