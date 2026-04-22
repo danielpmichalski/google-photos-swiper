@@ -145,6 +145,15 @@
         }
         #album-select:disabled { opacity: 0.55; cursor: default; }
 
+        #album-badge {
+          font-size: 11px; padding: 2px 8px; border-radius: 10px;
+          white-space: nowrap; font-family: inherit; display: none;
+        }
+        #album-badge.in {
+          display: inline;
+          background: #dcfce7; color: #166534; border: 1px solid #86efac;
+        }
+
         #toggle {
           position: fixed; bottom: 12px; right: 14px;
           z-index: 2147483647;
@@ -175,6 +184,7 @@
           </select>
           <span id="counter">skipped <b id="n-skip">0</b> &middot; added <b id="n-add">0</b></span>
           <span id="load-status">Loading albums…</span>
+          <span id="album-badge"></span>
         </div>
         <div class="sep"></div>
         <button class="action" id="btn-add">
@@ -196,6 +206,9 @@
       if (selectedAlbum) {
         chrome.storage.local.set({ ps_album_id: opt.value, ps_album_title: opt.text });
         showToast(`Album set: ${opt.text}`, 'success');
+        refreshBadge();
+      } else {
+        setAlbumBadge(null);
       }
     });
 
@@ -203,7 +216,10 @@
       skipCount = data.ps_skip || 0;
       addCount  = data.ps_add  || 0;
       updateCounter();
-      if (data.ps_album_id) selectedAlbum = { id: data.ps_album_id, title: data.ps_album_title };
+      if (data.ps_album_id) {
+        selectedAlbum = { id: data.ps_album_id, title: data.ps_album_title };
+        refreshBadge();
+      }
       loadAlbums();
     });
   }
@@ -509,6 +525,18 @@
     return m ? m[1] === selectedAlbum.id : false;
   }
 
+  function setAlbumBadge(state) {
+    const b = S('album-badge');
+    if (!b) return;
+    b.className = state || '';
+    b.textContent = state === 'in' ? '✓ Already in album' : '';
+  }
+
+  function refreshBadge() {
+    if (!selectedAlbum || !location.href.includes('/photo/')) { setAlbumBadge(null); return; }
+    setAlbumBadge(isAlreadyInAlbumByUrl() ? 'in' : null);
+  }
+
   function isVisible(el) {
     if (!el) return false;
     const r = el.getBoundingClientRect();
@@ -529,6 +557,7 @@
   new MutationObserver(() => {
     if (location.href === lastUrl) return;
     lastUrl = location.href;
+    if (location.href.includes('/photo/')) refreshBadge();
     if (location.href.includes('/albums')) {
       setTimeout(() => { if (S('album-select')?.options.length <= 1) loadAlbums(); }, 1200);
     }
