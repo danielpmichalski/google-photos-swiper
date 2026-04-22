@@ -1,4 +1,4 @@
-# Photos Sorter
+# Google Photos Sorter
 
 A Chrome extension for rapidly sorting Google Photos into albums using keyboard shortcuts. Burns through a backlog of hundreds of unorganized photos with minimal effort.
 
