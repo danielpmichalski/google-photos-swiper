@@ -399,51 +399,45 @@
 
   async function pickAlbumInDialog() {
     const target = selectedAlbum.title.toLowerCase();
-
-    function clickOrDetect(li) {
-      // Option A: photo already in album — close dialog and signal caller
-      if (li.getAttribute('aria-selected') === 'true') { fireKey('Escape'); return 'already'; }
-      li.click();
-      return 'added';
-    }
-
     for (let i = 0; i < 25; i++) {
-      const listbox = document.querySelector('[role="listbox"]');
-
-      if (listbox) {
-        // Primary: direct match by album ID stored in data-id attribute
-        const byId = listbox.querySelector(`[data-id="${selectedAlbum.id}"]`);
-        if (byId && isVisible(byId)) return clickOrDetect(byId);
-
-        // Secondary: match li[role="option"] by aria-label (starts with title) or title span
-        for (const li of listbox.querySelectorAll('[role="option"]')) {
-          if (!isVisible(li)) continue;
-          const label = (li.getAttribute('aria-label') || '').toLowerCase();
-          if (label === target || label.startsWith(target + ' ') || label.startsWith(target + '·')) {
-            return clickOrDetect(li);
-          }
-          // Title lives in span[jsname="K4r5Ff"]
-          const titleSpan = li.querySelector('[jsname="K4r5Ff"]');
-          if (titleSpan && titleSpan.textContent.trim().toLowerCase() === target) {
-            return clickOrDetect(li);
-          }
-        }
-      }
-
-      // Fallback: any [role="option"] in the document
-      for (const li of document.querySelectorAll('[role="option"]')) {
-        if (!isVisible(li)) continue;
-        const label = (li.getAttribute('aria-label') || '').toLowerCase();
-        if (label === target || label.startsWith(target + ' ')) return clickOrDetect(li);
-        const own = [...li.childNodes].filter(n => n.nodeType === 3).map(n => n.textContent.trim()).join('').toLowerCase();
-        if (own === target) return clickOrDetect(li);
-      }
-
+      const li = findAlbumOption(target);
+      if (li) return clickOrDetect(li);
       await sleep(200);
     }
-
     console.warn('[PhotosSorter] album not found in dialog. id:', selectedAlbum.id, 'title:', selectedAlbum.title);
     return 'not-found';
+  }
+
+  function clickOrDetect(li) {
+    if (li.getAttribute('aria-selected') === 'true') { fireKey('Escape'); return 'already'; }
+    li.click();
+    return 'added';
+  }
+
+  function findAlbumOption(target) {
+    const listbox = document.querySelector('[role="listbox"]');
+    if (listbox) {
+      const byId = listbox.querySelector(`[data-id="${selectedAlbum.id}"]`);
+      if (byId && isVisible(byId)) return byId;
+    }
+    // Search within listbox when available, whole document while it's still loading
+    const root = listbox ?? document;
+    for (const li of root.querySelectorAll('[role="option"]')) {
+      if (isVisible(li) && albumOptionMatches(li, target)) return li;
+    }
+    return null;
+  }
+
+  function albumOptionMatches(li, target) {
+    const label = (li.getAttribute('aria-label') || '').toLowerCase();
+    if (label === target || label.startsWith(target + ' ') || label.startsWith(target + '·')) return true;
+    const titleSpan = li.querySelector('[jsname="K4r5Ff"]');
+    if (titleSpan && titleSpan.textContent.trim().toLowerCase() === target) return true;
+    const ownText = [...li.childNodes]
+      .filter(n => n.nodeType === Node.TEXT_NODE)
+      .map(n => n.textContent.trim())
+      .join('').toLowerCase();
+    return ownText === target;
   }
 
   // ─── Keyboard ─────────────────────────────────────────────────────────────
@@ -527,7 +521,7 @@
   }
 
   function isAlreadyInAlbumByUrl() {
-    const m = location.pathname.match(/\/album\/([^/]+)\/photo\//);
+    const m = /\/album\/([^/]+)\/photo\//.exec(location.pathname);
     return m ? m[1] === selectedAlbum.id : false;
   }
 
