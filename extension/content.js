@@ -419,10 +419,12 @@
     if (listbox) {
       const byId = listbox.querySelector(`[data-id="${selectedAlbum.id}"]`);
       if (byId && isVisible(byId)) return byId;
+      for (const li of listbox.querySelectorAll('[role="option"]')) {
+        if (isVisible(li) && albumOptionMatches(li, target)) return li;
+      }
     }
-    // Search within listbox when available, whole document while it's still loading
-    const root = listbox ?? document;
-    for (const li of root.querySelectorAll('[role="option"]')) {
+    // Always fall back to document-wide search — album options may live outside listbox
+    for (const li of document.querySelectorAll('[role="option"]')) {
       if (isVisible(li) && albumOptionMatches(li, target)) return li;
     }
     return null;
