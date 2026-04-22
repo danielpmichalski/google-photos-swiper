@@ -369,45 +369,45 @@
   }
 
   async function pickAlbumInDialog() {
-    const target = selectedAlbum.title.toLowerCase();
-
     for (let i = 0; i < 25; i++) {
-      const listbox = document.querySelector('[role="listbox"]');
-
-      if (listbox) {
-        // Primary: direct match by album ID stored in data-id attribute
-        const byId = listbox.querySelector(`[data-id="${selectedAlbum.id}"]`);
-        if (byId && isVisible(byId)) { byId.click(); return true; }
-
-        // Secondary: match li[role="option"] by aria-label (starts with title) or title span
-        for (const li of listbox.querySelectorAll('[role="option"]')) {
-          if (!isVisible(li)) continue;
-          const label = (li.getAttribute('aria-label') || '').toLowerCase();
-          if (label === target || label.startsWith(target + ' ') || label.startsWith(target + '·')) {
-            li.click(); return true;
-          }
-          // Title lives in span[jsname="K4r5Ff"]
-          const titleSpan = li.querySelector('[jsname="K4r5Ff"]');
-          if (titleSpan && titleSpan.textContent.trim().toLowerCase() === target) {
-            li.click(); return true;
-          }
-        }
-      }
-
-      // Fallback: any [role="option"] in the document
-      for (const li of document.querySelectorAll('[role="option"]')) {
-        if (!isVisible(li)) continue;
-        const label = (li.getAttribute('aria-label') || '').toLowerCase();
-        if (label === target || label.startsWith(target + ' ')) { li.click(); return true; }
-        const own = [...li.childNodes].filter(n => n.nodeType === 3).map(n => n.textContent.trim()).join('').toLowerCase();
-        if (own === target) { li.click(); return true; }
-      }
-
+      const li = findAlbumOption();
+      if (li) { li.click(); return true; }
       await sleep(200);
     }
-
     console.warn('[PhotosSorter] album not found in dialog. id:', selectedAlbum.id, 'title:', selectedAlbum.title);
     return false;
+  }
+
+  function findAlbumOption() {
+    const listbox = document.querySelector('[role="listbox"]');
+
+    // data-id is the most reliable match — only present when listbox is rendered
+    if (listbox) {
+      const byId = listbox.querySelector(`[data-id="${selectedAlbum.id}"]`);
+      if (byId && isVisible(byId)) return byId;
+    }
+
+    // Search within listbox when available, whole document while it's still loading
+    const root = listbox ?? document;
+    for (const li of root.querySelectorAll('[role="option"]')) {
+      if (isVisible(li) && albumOptionMatches(li)) return li;
+    }
+    return null;
+  }
+
+  function albumOptionMatches(li) {
+    const title = selectedAlbum.title.toLowerCase();
+    const label = (li.getAttribute('aria-label') || '').toLowerCase();
+    if (label === title || label.startsWith(title + ' ') || label.startsWith(title + '·')) return true;
+    // Title span used by Google Photos (jsname="K4r5Ff")
+    const span = li.querySelector('[jsname="K4r5Ff"]');
+    if (span && span.textContent.trim().toLowerCase() === title) return true;
+    // Plain text node fallback
+    const ownText = [...li.childNodes]
+      .filter(n => n.nodeType === Node.TEXT_NODE)
+      .map(n => n.textContent.trim())
+      .join('').toLowerCase();
+    return ownText === title;
   }
 
   // ─── Keyboard ─────────────────────────────────────────────────────────────
