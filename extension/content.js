@@ -146,6 +146,16 @@
         }
         #album-select:disabled { opacity: 0.55; cursor: default; }
 
+        #album-badge {
+          font-size: 11px; padding: 2px 8px; border-radius: 10px;
+          white-space: nowrap; font-family: inherit; display: none;
+        }
+        #album-badge.in {
+          display: inline;
+          background: #dcfce7; color: #166534; border: 1px solid #86efac;
+        }
+
+
         #toggle {
           position: fixed; bottom: 12px; right: 14px;
           z-index: 2147483647;
@@ -176,6 +186,7 @@
           </select>
           <span id="counter">skipped <b id="n-skip">0</b> &middot; added <b id="n-add">0</b></span>
           <span id="load-status">Loading albums…</span>
+          <span id="album-badge"></span>
         </div>
         <div class="sep"></div>
         <button class="action" id="btn-add">
@@ -197,6 +208,9 @@
       if (selectedAlbum) {
         chrome.storage.local.set({ ps_album_id: opt.value, ps_album_title: opt.text });
         showToast(`Album set: ${opt.text}`, 'success');
+        refreshBadge();
+      } else {
+        setAlbumBadge(null);
       }
     });
 
@@ -303,12 +317,26 @@
     }
     if (isProcessing) return;
 
+    // Option C: free URL pre-check (only works when browsing from within the album)
+    if (isAlreadyInAlbumByUrl()) {
+      showToast('Already in this album');
+      await sleep(450);
+      goToNextPhoto();
+      return;
+    }
+
     isProcessing = true;
     flashScreen('right');
     showToast(`Adding to "${selectedAlbum.title}"…`);
 
     try {
-      await automateAddToAlbum();
+      const result = await automateAddToAlbum();
+      if (result === 'already') {
+        showToast('Already in this album');
+        await sleep(450);
+        goToNextPhoto();
+        return;
+      }
       addCount++;
       updateCounter();
       chrome.storage.local.set({ ps_add: addCount });
@@ -342,8 +370,9 @@
     await sleep(1200);
 
     // 3. Pick album in dialog
-    const found = await pickAlbumInDialog();
-    if (!found) throw new Error(`Album "${selectedAlbum.title}" not found in dialog`);
+    const result = await pickAlbumInDialog();
+    if (result === 'not-found') throw new Error(`Album "${selectedAlbum.title}" not found in dialog`);
+    return result; // 'added' | 'already'
   }
 
   function findByAriaLabel(labels) {
@@ -371,25 +400,32 @@
   async function pickAlbumInDialog() {
     const target = selectedAlbum.title.toLowerCase();
 
+    function clickOrDetect(li) {
+      // Option A: photo already in album — close dialog and signal caller
+      if (li.getAttribute('aria-selected') === 'true') { fireKey('Escape'); return 'already'; }
+      li.click();
+      return 'added';
+    }
+
     for (let i = 0; i < 25; i++) {
       const listbox = document.querySelector('[role="listbox"]');
 
       if (listbox) {
         // Primary: direct match by album ID stored in data-id attribute
         const byId = listbox.querySelector(`[data-id="${selectedAlbum.id}"]`);
-        if (byId && isVisible(byId)) { byId.click(); return true; }
+        if (byId && isVisible(byId)) return clickOrDetect(byId);
 
         // Secondary: match li[role="option"] by aria-label (starts with title) or title span
         for (const li of listbox.querySelectorAll('[role="option"]')) {
           if (!isVisible(li)) continue;
           const label = (li.getAttribute('aria-label') || '').toLowerCase();
           if (label === target || label.startsWith(target + ' ') || label.startsWith(target + '·')) {
-            li.click(); return true;
+            return clickOrDetect(li);
           }
           // Title lives in span[jsname="K4r5Ff"]
           const titleSpan = li.querySelector('[jsname="K4r5Ff"]');
           if (titleSpan && titleSpan.textContent.trim().toLowerCase() === target) {
-            li.click(); return true;
+            return clickOrDetect(li);
           }
         }
       }
@@ -398,16 +434,16 @@
       for (const li of document.querySelectorAll('[role="option"]')) {
         if (!isVisible(li)) continue;
         const label = (li.getAttribute('aria-label') || '').toLowerCase();
-        if (label === target || label.startsWith(target + ' ')) { li.click(); return true; }
+        if (label === target || label.startsWith(target + ' ')) return clickOrDetect(li);
         const own = [...li.childNodes].filter(n => n.nodeType === 3).map(n => n.textContent.trim()).join('').toLowerCase();
-        if (own === target) { li.click(); return true; }
+        if (own === target) return clickOrDetect(li);
       }
 
       await sleep(200);
     }
 
     console.warn('[PhotosSorter] album not found in dialog. id:', selectedAlbum.id, 'title:', selectedAlbum.title);
-    return false;
+    return 'not-found';
   }
 
   // ─── Keyboard ─────────────────────────────────────────────────────────────
@@ -490,6 +526,23 @@
     }
   }
 
+  function isAlreadyInAlbumByUrl() {
+    const m = location.pathname.match(/\/album\/([^/]+)\/photo\//);
+    return m ? m[1] === selectedAlbum.id : false;
+  }
+
+  function setAlbumBadge(state) {
+    const b = S('album-badge');
+    if (!b) return;
+    b.className = state || '';
+    b.textContent = state === 'in' ? '✓ Already in album' : '';
+  }
+
+  function refreshBadge() {
+    if (!selectedAlbum || !location.href.includes('/photo/')) { setAlbumBadge(null); return; }
+    setAlbumBadge(isAlreadyInAlbumByUrl() ? 'in' : null);
+  }
+
   function isVisible(el) {
     if (!el) return false;
     const r = el.getBoundingClientRect();
@@ -505,11 +558,12 @@
     buildOverlay();
   }
 
-  // Re-scrape albums on SPA navigation to /albums.
+  // Re-scrape albums on SPA navigation to /albums; refresh badge on photo navigation.
   let lastUrl = location.href;
   new MutationObserver(() => {
     if (location.href === lastUrl) return;
     lastUrl = location.href;
+    if (location.href.includes('/photo/')) refreshBadge();
     if (location.href.includes('/albums')) {
       setTimeout(() => { if (S('album-select')?.options.length <= 1) loadAlbums(); }, 1200);
     }
