@@ -10,7 +10,8 @@
   let skipCount = 0;
   let addCount = 0;
   let isProcessing = false;
-  let hudVisible = true;
+  let hudVisible = false;
+  let albumsLoaded = false;
 
   // ─── Build overlay using Shadow DOM ──────────────────────────────────────
   // Attaching to <html> (not body) avoids being clipped by body overflow:hidden.
@@ -220,8 +221,9 @@
         selectedAlbum = { id: data.ps_album_id, title: data.ps_album_title };
         refreshBadge();
       }
-      loadAlbums();
     });
+
+    setHud(false);
   }
 
   function S(id) { return window.__psShadow?.getElementById(id); }
@@ -518,6 +520,10 @@
     hudVisible = visible;
     S('hud')?.classList.toggle('hidden', !visible);
     S('toggle')?.classList.toggle('visible', !visible);
+    if (visible && !albumsLoaded) {
+      albumsLoaded = true;
+      loadAlbums();
+    }
   }
 
   function isAlreadyInAlbumByUrl() {
