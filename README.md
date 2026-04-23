@@ -44,6 +44,34 @@ bash build.sh
 
 This produces `google-photos-swiper.zip` in the repo root — upload that file directly to the [Chrome Developer Dashboard](https://chrome.google.com/webstore/devconsole).
 
+## Publishing to Chrome Web Store
+
+1. **Build the ZIP** — run `bash build.sh`. This creates `google-photos-swiper.zip` in the repo root.
+
+2. **Open the Developer Dashboard** — go to [chrome.google.com/webstore/devconsole](https://chrome.google.com/webstore/devconsole) and sign in with your Google account. Pay the one-time $5 developer registration fee if
+   you haven't already.
+
+3. **Create a new item** — click **New item** and upload `google-photos-swiper.zip`.
+
+4. **Fill in the store listing:**
+    - **Name:** Google Photos Swiper
+    - **Short description** (≤132 chars): Keyboard-driven album sorter for Google Photos. Press → to add, ← to skip — burn through your photo backlog in minutes.
+    - **Detailed description:** Paste a walkthrough covering: HUD bar, keyboard shortcuts (→ add, ← skip, ` toggle), album dropdown, session counter, and the note that no API key or OAuth is required.
+    - **Category:** Productivity
+    - **Language:** English
+
+5. **Upload screenshots** — take 1–5 screenshots at **1280×800** showing the HUD bar in use (album dropdown open, photo being added, session counter). Chrome Web Store requires at least one.
+
+6. **Upload the store icon** — use `extension/images/icon-512.png` (512×512).
+
+7. **Set privacy / permissions justification** — the dashboard will ask why the extension needs each permission. Suggested answers:
+    - `storage`: Persist the selected album and session counters across page loads.
+    - `scripting`: Inject the HUD overlay into Google Photos and automate the "Add to album" UI flow.
+    - `tabs`: Open a background tab once on startup to scrape the user's album list.
+    - `https://photos.google.com/*`: The extension only operates on Google Photos pages.
+
+8. **Submit for review** — click **Submit for review**. New extensions typically take 1–3 business days. You'll get an email when it's approved or if changes are requested.
+
 ## Requirements
 
 - Google Chrome (Manifest V3)
