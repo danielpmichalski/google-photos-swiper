@@ -30,6 +30,12 @@
       "run_at": "document_idle"
     }
   ],
+  "web_accessible_resources": [
+    {
+      "resources": ["images/*.png"],
+      "matches": ["https://photos.google.com/*"]
+    }
+  ],
   "action": {
     "default_popup": "popup.html",
     "default_title": "Google Photos Swiper",
