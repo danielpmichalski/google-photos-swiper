@@ -34,6 +34,16 @@ Install from the [Chrome Web Store](https://chrome.google.com/webstore) *(link c
 
 Albums are loaded automatically on startup (the extension briefly opens a background tab to scrape your album list — this takes a few seconds on first load).
 
+## Building
+
+To package the extension for the Chrome Web Store:
+
+```bash
+bash build.sh
+```
+
+This produces `google-photos-swiper.zip` in the repo root — upload that file directly to the [Chrome Developer Dashboard](https://chrome.google.com/webstore/devconsole).
+
 ## Requirements
 
 - Google Chrome (Manifest V3)
