@@ -8,7 +8,3 @@ document.getElementById('btn-photos').addEventListener('click', e => {
   chrome.tabs.create({url: 'https://photos.google.com'});
 });
 
-document.getElementById('btn-albums').addEventListener('click', e => {
-  e.preventDefault();
-  chrome.tabs.create({url: 'https://photos.google.com/albums'});
-});

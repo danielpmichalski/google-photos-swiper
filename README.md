@@ -14,7 +14,9 @@ The extension automates Google Photos' own "Add to album" UI flow — no Google 
 
 ## Installation
 
-The extension is not on the Chrome Web Store. Install it as an unpacked extension:
+Install from the [Chrome Web Store](https://chrome.google.com/webstore) *(link coming soon)*.
+
+**Or install manually (developer mode):**
 
 1. Clone or download this repo
 2. Open Chrome and go to `chrome://extensions`

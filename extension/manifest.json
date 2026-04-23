@@ -3,6 +3,11 @@
   "name": "Google Photos Swiper",
   "version": "1.0",
   "description": "Keyboard-driven album assignment overlay for Google Photos.",
+  "icons": {
+    "16": "images/icon-16.png",
+    "48": "images/icon-48.png",
+    "128": "images/icon-128.png"
+  },
   "permissions": [
     "scripting",
     "storage",
@@ -27,6 +32,11 @@
   ],
   "action": {
     "default_popup": "popup.html",
-    "default_title": "Google Photos Swiper"
+    "default_title": "Google Photos Swiper",
+    "default_icon": {
+      "16": "images/icon-16.png",
+      "48": "images/icon-48.png",
+      "128": "images/icon-128.png"
+    }
   }
 }
