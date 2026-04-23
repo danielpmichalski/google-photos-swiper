@@ -169,6 +169,7 @@
         }
         #toggle.visible { opacity: 1; pointer-events: all; }
         #toggle:hover { box-shadow: 0 3px 12px rgba(0,0,0,0.13); color: #111; }
+        #toggle img { width: 16px; height: 16px; border-radius: 3px; display: block; }
       </style>
 
       <div id="flash"></div>
@@ -194,7 +195,7 @@
         </button>
       </div>
 
-      <div id="toggle">🗂 Google Photos Swiper</div>
+      <div id="toggle"><img src="${chrome.runtime.getURL('images/icon-16.png')}"> Google Photos Swiper</div>
     `;
 
     window.__psShadow = shadow;
