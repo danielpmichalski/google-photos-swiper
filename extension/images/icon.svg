@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+    <defs>
+        <clipPath id="card-clip">
+            <rect x="86" y="86" width="340" height="340" rx="24" ry="24"/>
+        </clipPath>
+    </defs>
+
+    <!-- Background -->
+    <rect x="0" y="0" width="512" height="512" rx="100" ry="100" fill="#4A86E8"/>
+
+    <!-- Photo card white background -->
+    <rect x="86" y="86" width="340" height="340" rx="24" ry="24" fill="#FFFFFF"/>
+
+    <!-- Photo interior (clipped to card) -->
+    <g clip-path="url(#card-clip)">
+        <!-- Sky -->
+        <rect x="86" y="86" width="340" height="340" fill="#C5DCF0"/>
+        <!-- Mountain dark (left) -->
+        <polygon points="196,218 86,370 306,370" fill="#4A6FA5"/>
+        <!-- Mountain light (right) -->
+        <polygon points="320,195 176,370 426,370" fill="#6B8FC4"/>
+        <!-- Grass -->
+        <rect x="86" y="370" width="340" height="86" fill="#5BAD5B"/>
+        <!-- Sun -->
+        <circle cx="175" cy="150" r="36" fill="#F5C518"/>
+    </g>
+
+    <!-- Chevron left -->
+    <polyline points="63,216 28,256 63,296"
+              fill="none" stroke="#FFFFFF" stroke-width="22"
+              stroke-linecap="round" stroke-linejoin="round"/>
+
+    <!-- Chevron right -->
+    <polyline points="449,216 484,256 449,296"
+              fill="none" stroke="#FFFFFF" stroke-width="22"
+              stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
